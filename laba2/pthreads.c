@@ -17,7 +17,6 @@ void *heavy_task(void *i) {
 void pthreads(int n) {
 
   pthread_t threads[n];
-  int status;
 
   for (int i = 0; i < n; i++) {
     int *thread_num = (int*) malloc(sizeof(int));
