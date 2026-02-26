@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 199309L
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -9,7 +11,7 @@ void *heavy_task(void *i) {
   for (int i = 0; i < 1e8; i++) {
     sqrt(i);
   }
-  printf("\tThread #%d finished\n", thread_num);
+  // printf("\tThread #%d finished\n", thread_num);
   free(i);
 }
 
@@ -39,7 +41,7 @@ void sequential(int n) {
         for (int i = 0; i < 1e8; i++) {
           sqrt(i);
         }
-        printf("\tTask #%d finished\n", j);
+        // printf("\tTask #%d finished\n", j);
     }
 }
 
@@ -47,19 +49,19 @@ void sequential(int n) {
 
 int main(int argc, char** argv) {
   int n = atoi(argv[1]);
-  clock_t start, end;
+  struct timespec start, end;
   double elapsed;
 
-  start = clock();
+  clock_gettime(CLOCK_REALTIME, &start);
   sequential(n);
-  end = clock();
-  elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+  clock_gettime(CLOCK_REALTIME, &end);
+  elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec)/1e9;
   printf("Последовательное выполнение заняло %.2f секунд\n", elapsed);
 
-  start = clock();
+  clock_gettime(CLOCK_REALTIME, &start);
   pthreads(n);
-  end = clock();
-  elapsed = (double)(end - start) / CLOCKS_PER_SEC;
+  clock_gettime(CLOCK_REALTIME, &end);
+  elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec)/1e9;
   printf("Параллельное выполнение заняло %.2f секунд\n", elapsed);
 
   return 0;
